@@ -147,7 +147,9 @@ class AbstractGenerateDerivative extends EmitEvent {
 
     $source_media = $this->utils->getMediaWithTerm($entity, $source_term);
     if (!$source_media) {
-      throw new \RuntimeException("Could not locate source media", 500);
+      print_r('source term:');
+      print_r($source_term);
+      throw new \RuntimeException("Could not locate source media for " . $source_term, 500);
     }
 
     $source_file = $this->mediaSource->getSourceFile($source_media);
@@ -160,7 +162,9 @@ class AbstractGenerateDerivative extends EmitEvent {
     // Find the term for the derivative and use it to set the destination url
     // in the data array.
     $derivative_term = $this->utils->getTermForUri($this->configuration['derivative_term_uri']);
-    if (!$source_term) {
+    if (!$derivative_term) {
+      print_r('derivative_term_uri');
+      print_r($this->configuration['derivative_term_uri']);
       throw new \RuntimeException("Could not locate derivative term with uri" . $this->configuration['derivative_term_uri'], 500);
     }
 
