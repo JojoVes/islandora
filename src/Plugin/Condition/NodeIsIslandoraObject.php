@@ -3,6 +3,7 @@
 namespace Drupal\islandora\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Islandora\IslandoraUtils;
@@ -54,6 +55,45 @@ class NodeIsIslandoraObject extends ConditionPluginBase implements ContainerFact
       $plugin_definition,
       $container->get('islandora.utils')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    return array_merge(
+      [
+        'use_this_condition' => 'no',
+      ],
+      parent::defaultConfiguration()
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form['use_this_condition'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Use this condition'),
+      '#description' => $this->t('Select "yes" to ensure this condition is evaluated.'),
+      '#default_value' => $this->configuration['use_this_condition'],
+      '#options' => [
+        'yes' => 'Yes',
+        'no' => 'No',
+      ],
+    ];
+
+    return parent::buildConfigurationForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $this->configuration['use_this_condition'] = $form_state->getValue('use_this_condition');
+
+    parent::submitConfigurationForm($form, $form_state);
   }
 
   /**
