@@ -15,7 +15,11 @@ use Drupal\Islandora\IslandoraUtils;
  *   id = "node_is_islandora_object",
  *   label = @Translation("Node is an Islandora node"),
  *   context_definitions = {
- *     "node" = @ContextDefinition("entity:node", required = TRUE , label = @Translation("node"))
+ *     "node" = @ContextDefinition("entity:node",
+ *       required = FALSE,
+ *       label = @Translation("Node source"),
+ *       description = @Translation("The node source must be set for this condition to work as expected.")
+ *     )
  *   }
  * )
  */
@@ -61,39 +65,22 @@ class NodeIsIslandoraObject extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array_merge(
-      [
-        'use_this_condition' => 'no',
-      ],
-      parent::defaultConfiguration()
-    );
-  }
+    $defaults = parent::defaultConfiguration();
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['use_this_condition'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Use this condition'),
-      '#description' => $this->t('Select "yes" to ensure this condition is evaluated when using in Block Visibility.'),
-      '#default_value' => $this->configuration['use_this_condition'],
-      '#options' => [
-        'yes' => 'Yes',
-        'no' => 'No',
-      ],
-    ];
+    // XXX: There appear to be expectations in Drupal that there will be more
+    // config to a plugin than just selecting the context mapping; however, it
+    // is our only configuration. Due to these expectations, it would fail to
+    // save our visibility settings. To work around, it seems to be sufficient
+    // to dynamically declare our default configuration, such that the
+    // difference from the default configuration can be detected upstream.
+    // @see https://git.drupalcode.org/project/drupal/-/blob/d87ab76d397a2cfe0457997be4f2648c4760b2f5/core/lib/Drupal/Core/Condition/ConditionPluginCollection.php#L39-44
+    if (!empty($this->configuration['context_mapping'])) {
+      $defaults += [
+        'context_mapping' => [],
+      ];
+    }
 
-    return parent::buildConfigurationForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['use_this_condition'] = $form_state->getValue('use_this_condition');
-
-    parent::submitConfigurationForm($form, $form_state);
+    return $defaults;
   }
 
   /**
