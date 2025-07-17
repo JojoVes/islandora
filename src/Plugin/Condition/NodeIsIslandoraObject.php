@@ -76,7 +76,7 @@ class NodeIsIslandoraObject extends ConditionPluginBase implements ContainerFact
     $form['use_this_condition'] = [
       '#type' => 'radios',
       '#title' => $this->t('Use this condition'),
-      '#description' => $this->t('Select "yes" to ensure this condition is evaluated.'),
+      '#description' => $this->t('Select "yes" to ensure this condition is evaluated when using in Block Visibility.'),
       '#default_value' => $this->configuration['use_this_condition'],
       '#options' => [
         'yes' => 'Yes',
